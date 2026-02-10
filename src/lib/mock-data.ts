@@ -583,8 +583,11 @@ export const mockWorkflows: Workflow[] = [
 
 // ── Cost Data (14 days, $100-200/day) ───────────────────────────────
 
+const _today = new Date();
+_today.setHours(0, 0, 0, 0);
+
 export const mockCostData: CostEntry[] = Array.from({ length: 14 }, (_, i) => {
-  const date = new Date(2026, 1, 8 - 13 + i);
+  const date = new Date(_today.getTime() - (13 - i) * 86_400_000);
   const totalCost = randomFloat(105, 195);
   return {
     date: date.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
