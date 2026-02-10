@@ -149,7 +149,7 @@ export function Sidebar() {
           </div>
           <span className="text-[8px] font-bold uppercase tracking-wider text-emerald-400">Online</span>
         </div>
-        <p className="mt-1 font-mono text-[9px] text-muted-foreground/70">ws://localhost:18789</p>
+        <p className="mt-1 font-mono text-[9px] text-muted-foreground/70">wss://••••••••:••••</p>
         <div className="mt-1.5 h-[2px] w-full overflow-hidden rounded-full bg-muted">
           <div className="h-full w-full shimmer rounded-full" />
         </div>
