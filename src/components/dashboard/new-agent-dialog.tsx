@@ -21,18 +21,21 @@ import {
 } from "@/components/ui/select";
 
 const MODELS = [
-  // Anthropic Claude (latest 2026)
+  // Anthropic Claude (Feb 2026)
   { value: "claude-opus-4-6", label: "Claude Opus 4.6", badge: "Latest" },
   { value: "claude-sonnet-4-5", label: "Claude Sonnet 4.5", badge: "Recommended" },
   { value: "claude-haiku-4-5", label: "Claude Haiku 4.5", badge: "Fastest" },
-  // OpenAI (latest 2026)
-  { value: "gpt-5.3-codex", label: "GPT-5.3 Codex", badge: "Latest" },
+  // OpenAI (Feb 2026) - o-series reasoning models
+  { value: "o3", label: "OpenAI o3", badge: "Latest" },
+  { value: "o4-mini", label: "OpenAI o4-mini", badge: "Fast" },
+  { value: "gpt-4.1", label: "GPT-4.1" },
+  { value: "gpt-4.1-mini", label: "GPT-4.1 mini" },
   { value: "gpt-4o", label: "GPT-4o" },
-  { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
-  // Google Gemini (latest 2026)
+  // Google Gemini (Feb 2026)
   { value: "gemini-3-flash", label: "Gemini 3 Flash", badge: "Latest" },
-  { value: "gemini-3-pro-preview", label: "Gemini 3 Pro Preview", badge: "Most Capable" },
+  { value: "gemini-3-pro", label: "Gemini 3 Pro", badge: "Most Capable" },
   { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
+  { value: "gemini-2.0-flash", label: "Gemini 2.0 Flash" },
 ];
 
 const CAPABILITIES = [
