@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Zap, Key, Bot, ArrowRight, Loader2, CheckCircle2, Sparkles } from "lucide-react";
+import { Zap, Key, Bot, ArrowRight, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
-import { APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-const STEPS = ["Workspace", "API Key", "First Agent"] as const;
+const STEPS = ["Workspace", "API Key", "Agent"] as const;
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -18,7 +17,7 @@ export default function OnboardingPage() {
   const [error, setError] = useState("");
 
   // Step 1: Workspace
-  const [workspaceName, setWorkspaceName] = useState("My Workspace");
+  const [workspaceName, setWorkspaceName] = useState("");
 
   // Step 2: API Key
   const [provider, setProvider] = useState<"anthropic" | "openai" | "gemini">("anthropic");
@@ -47,7 +46,7 @@ export default function OnboardingPage() {
         .from("workspaces")
         .insert({
           user_id: user.id,
-          name: workspaceName,
+          name: workspaceName || "My Workspace",
           [keyField]: apiKey || null,
         })
         .select()
@@ -70,7 +69,7 @@ export default function OnboardingPage() {
         await supabase.from("activities").insert({
           workspace_id: workspace.id,
           type: "agent_started",
-          description: `${agentName} joined the crew as ${agentRole || "General Assistant"}`,
+          description: `${agentName} joined as ${agentRole || "General Assistant"}`,
         });
       }
 
@@ -83,122 +82,125 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md space-y-6">
-        {/* Logo */}
-        <div className="text-center">
-          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-[#ff543d]">
-            <Zap className="h-5 w-5 text-white" />
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-[#ff543d]/[0.02] p-6">
+      <div className="w-full max-w-[480px]">
+        {/* Header */}
+        <div className="mb-12 text-center">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-[#ff543d] to-[#ff6b56] shadow-xl shadow-[#ff543d]/20">
+            <Zap className="h-8 w-8 text-white" />
           </div>
-          <h1 className="mt-4 text-xl font-semibold tracking-tight">Welcome to ClawDirector</h1>
-          <p className="mt-1 text-[13px] text-muted-foreground">
-            Let&apos;s set up your team — direct agents to production in 3 steps
+          <h1 className="text-[32px] font-semibold tracking-tight text-foreground">
+            Welcome!
+          </h1>
+          <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+            30 seconds to your first agent
           </p>
         </div>
 
-        {/* Step indicators */}
-        <div className="flex items-center justify-center gap-2">
+        {/* Progress */}
+        <div className="mb-10 flex items-center justify-center gap-3">
           {STEPS.map((label, i) => (
-            <div key={label} className="flex items-center gap-2">
-              <div
-                className={cn(
-                  "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold transition-colors",
-                  i < step
-                    ? "bg-emerald-500 text-white"
-                    : i === step
-                      ? "bg-[#ff543d] text-white"
-                      : "bg-muted text-muted-foreground"
-                )}
-              >
-                {i < step ? <CheckCircle2 className="h-3.5 w-3.5" /> : i + 1}
+            <div key={label} className="flex items-center gap-3">
+              <div className="flex flex-col items-center gap-2">
+                <div
+                  className={cn(
+                    "flex h-8 w-8 items-center justify-center rounded-full text-[13px] font-semibold transition-all duration-300",
+                    i < step
+                      ? "bg-emerald-500 text-white shadow-sm"
+                      : i === step
+                        ? "bg-[#ff543d] text-white shadow-lg shadow-[#ff543d]/30"
+                        : "bg-muted/50 text-muted-foreground"
+                  )}
+                >
+                  {i < step ? <Check className="h-4 w-4" /> : i + 1}
+                </div>
+                <span className={cn(
+                  "text-[11px] font-medium transition-colors",
+                  i === step ? "text-foreground" : "text-muted-foreground/60"
+                )}>
+                  {label}
+                </span>
               </div>
-              <span className={cn(
-                "text-[11px] font-medium",
-                i === step ? "text-foreground" : "text-muted-foreground"
-              )}>
-                {label}
-              </span>
               {i < STEPS.length - 1 && (
-                <div className="mx-1 h-px w-6 bg-border" />
+                <div className={cn(
+                  "h-[1px] w-12 transition-colors",
+                  i < step ? "bg-emerald-500/30" : "bg-border/50"
+                )} />
               )}
             </div>
           ))}
         </div>
 
-        {/* Step content */}
-        <div className="rounded-xl border border-border bg-card p-6">
+        {/* Card */}
+        <div className="rounded-[24px] border border-border/50 bg-card/80 p-10 shadow-2xl shadow-black/[0.03] backdrop-blur-xl">
+          {/* Step 1: Workspace */}
           {step === 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-[#ff543d]" />
-                <h2 className="text-[14px] font-semibold">Name your workspace</h2>
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-[17px] font-semibold tracking-tight">
+                  Name your workspace
+                </h2>
+                <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
+                  Give your team a name. Think project or company.
+                </p>
               </div>
-              <p className="text-[12px] text-muted-foreground">
-                Your director name. This is where your AI team operates — you can change it later.
-              </p>
               <Input
                 value={workspaceName}
                 onChange={(e) => setWorkspaceName(e.target.value)}
-                placeholder="e.g. My Startup, Content Team, Dev Crew"
-                className="h-10 text-[13px]"
+                placeholder="Acme Corp"
+                className="h-12 rounded-xl border-border/50 text-[15px] transition-all focus:border-[#ff543d]/30 focus:ring-4 focus:ring-[#ff543d]/10"
+                autoFocus
               />
               <Button
-                className="h-10 w-full bg-[#ff543d] text-[13px] hover:bg-[#e04030]"
+                className="h-12 w-full rounded-xl bg-gradient-to-b from-[#ff543d] to-[#ff5a47] text-[15px] font-semibold shadow-lg shadow-[#ff543d]/20 transition-all hover:shadow-xl hover:shadow-[#ff543d]/30"
                 onClick={() => setStep(1)}
               >
-                Next <ArrowRight className="ml-2 h-4 w-4" />
+                Continue
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           )}
 
+          {/* Step 2: API Key */}
           {step === 1 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Key className="h-4 w-4 text-[#ff543d]" />
-                <h2 className="text-[14px] font-semibold">Add your AI provider key</h2>
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-[17px] font-semibold tracking-tight">
+                  Choose your AI
+                </h2>
+                <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
+                  Select a provider and add your API key.
+                </p>
               </div>
-              <p className="text-[12px] text-muted-foreground">
-                Choose a provider. We recommend Claude for most tasks.
-              </p>
 
-              {/* Provider selection */}
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => setProvider("anthropic")}
-                  className={cn(
-                    "rounded-lg border p-3 text-center transition-all",
-                    provider === "anthropic"
-                      ? "border-[#ff543d] bg-[#ff543d]/10"
-                      : "border-border hover:border-[#ff543d]/50"
-                  )}
-                >
-                  <p className="text-[11px] font-semibold">Claude</p>
-                  <p className="mt-0.5 text-[9px] text-muted-foreground">Best overall</p>
-                </button>
-                <button
-                  onClick={() => setProvider("openai")}
-                  className={cn(
-                    "rounded-lg border p-3 text-center transition-all",
-                    provider === "openai"
-                      ? "border-[#ff543d] bg-[#ff543d]/10"
-                      : "border-border hover:border-[#ff543d]/50"
-                  )}
-                >
-                  <p className="text-[11px] font-semibold">OpenAI</p>
-                  <p className="mt-0.5 text-[9px] text-muted-foreground">Versatile</p>
-                </button>
-                <button
-                  onClick={() => setProvider("gemini")}
-                  className={cn(
-                    "rounded-lg border p-3 text-center transition-all",
-                    provider === "gemini"
-                      ? "border-[#ff543d] bg-[#ff543d]/10"
-                      : "border-border hover:border-[#ff543d]/50"
-                  )}
-                >
-                  <p className="text-[11px] font-semibold">Gemini</p>
-                  <p className="mt-0.5 text-[9px] text-muted-foreground">Fast</p>
-                </button>
+              {/* Provider cards */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { value: "anthropic", label: "Claude", badge: "Best" },
+                  { value: "openai", label: "OpenAI", badge: "Popular" },
+                  { value: "gemini", label: "Gemini", badge: "Fast" }
+                ].map((p) => (
+                  <button
+                    key={p.value}
+                    onClick={() => setProvider(p.value as any)}
+                    className={cn(
+                      "group relative overflow-hidden rounded-2xl border p-4 text-center transition-all duration-200",
+                      provider === p.value
+                        ? "border-[#ff543d] bg-[#ff543d]/5 shadow-sm"
+                        : "border-border/50 bg-background/50 hover:border-border hover:bg-background"
+                    )}
+                  >
+                    <p className="text-[13px] font-semibold">{p.label}</p>
+                    <p className="mt-1 text-[10px] text-muted-foreground">{p.badge}</p>
+                    {provider === p.value && (
+                      <div className="absolute right-2 top-2">
+                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#ff543d]">
+                          <Check className="h-3 w-3 text-white" />
+                        </div>
+                      </div>
+                    )}
+                  </button>
+                ))}
               </div>
 
               <Input
@@ -206,90 +208,104 @@ export default function OnboardingPage() {
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 placeholder={
-                  provider === "anthropic" ? "sk-ant-api03-..." :
+                  provider === "anthropic" ? "sk-ant-..." :
                   provider === "openai" ? "sk-..." :
                   "AIza..."
                 }
-                className="h-10 font-mono text-[13px]"
+                className="h-12 rounded-xl border-border/50 font-mono text-[14px] transition-all focus:border-[#ff543d]/30 focus:ring-4 focus:ring-[#ff543d]/10"
               />
-              <p className="text-[10px] text-muted-foreground">
-                Get your key from{" "}
-                <a
-                  href={
-                    provider === "anthropic" ? "https://console.anthropic.com/settings/keys" :
-                    provider === "openai" ? "https://platform.openai.com/api-keys" :
-                    "https://makersuite.google.com/app/apikey"
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-[#ff543d] hover:underline"
-                >
-                  {provider === "anthropic" ? "console.anthropic.com" :
-                   provider === "openai" ? "platform.openai.com" :
-                   "Google AI Studio"}
-                </a>
-                {" • "}Stored encrypted. You can skip and add later.
+
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
+                Stored encrypted. Skip for now and add later in settings.
               </p>
-              <div className="flex gap-2">
-                <Button variant="outline" className="h-10 flex-1 text-[13px]" onClick={() => setStep(0)}>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="h-12 flex-1 rounded-xl border-border/50 text-[15px] font-medium hover:bg-background"
+                  onClick={() => setStep(0)}
+                >
                   Back
                 </Button>
                 <Button
-                  className="h-10 flex-1 bg-[#ff543d] text-[13px] hover:bg-[#e04030]"
+                  className="h-12 flex-1 rounded-xl bg-gradient-to-b from-[#ff543d] to-[#ff5a47] text-[15px] font-semibold shadow-lg shadow-[#ff543d]/20 transition-all hover:shadow-xl hover:shadow-[#ff543d]/30"
                   onClick={() => setStep(2)}
                 >
-                  {apiKey ? "Next" : "Skip for now"} <ArrowRight className="ml-2 h-4 w-4" />
+                  {apiKey ? "Continue" : "Skip"}
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </div>
           )}
 
+          {/* Step 3: First Agent */}
           {step === 2 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-[#ff543d]" />
-                <h2 className="text-[14px] font-semibold">Create your first agent</h2>
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-[17px] font-semibold tracking-tight">
+                  Create your first agent
+                </h2>
+                <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
+                  Give it a name and role. You can add more later.
+                </p>
               </div>
-              <p className="text-[12px] text-muted-foreground">
-                Give your agent a name and role. You can add more agents later.
-              </p>
-              <Input
-                value={agentName}
-                onChange={(e) => setAgentName(e.target.value)}
-                placeholder="e.g. Priya, Jarvis, Friday"
-                className="h-10 text-[13px]"
-              />
-              <Input
-                value={agentRole}
-                onChange={(e) => setAgentRole(e.target.value)}
-                placeholder="e.g. Content Writer, Researcher, Developer"
-                className="h-10 text-[13px]"
-              />
+
+              <div className="space-y-3">
+                <Input
+                  value={agentName}
+                  onChange={(e) => setAgentName(e.target.value)}
+                  placeholder="Agent name (e.g., Jarvis)"
+                  className="h-12 rounded-xl border-border/50 text-[15px] transition-all focus:border-[#ff543d]/30 focus:ring-4 focus:ring-[#ff543d]/10"
+                  autoFocus
+                />
+                <Input
+                  value={agentRole}
+                  onChange={(e) => setAgentRole(e.target.value)}
+                  placeholder="Role (e.g., Content Writer)"
+                  className="h-12 rounded-xl border-border/50 text-[15px] transition-all focus:border-[#ff543d]/30 focus:ring-4 focus:ring-[#ff543d]/10"
+                />
+              </div>
 
               {error && (
-                <p className="text-[12px] text-red-400">{error}</p>
+                <div className="rounded-xl bg-red-500/10 p-4">
+                  <p className="text-[13px] text-red-400">{error}</p>
+                </div>
               )}
 
-              <div className="flex gap-2">
-                <Button variant="outline" className="h-10 flex-1 text-[13px]" onClick={() => setStep(1)}>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="h-12 flex-1 rounded-xl border-border/50 text-[15px] font-medium hover:bg-background"
+                  onClick={() => setStep(1)}
+                >
                   Back
                 </Button>
                 <Button
                   disabled={loading}
-                  className="h-10 flex-1 bg-[#ff543d] text-[13px] hover:bg-[#e04030]"
+                  className="h-12 flex-1 rounded-xl bg-gradient-to-b from-[#ff543d] to-[#ff5a47] text-[15px] font-semibold shadow-lg shadow-[#ff543d]/20 transition-all hover:shadow-xl hover:shadow-[#ff543d]/30 disabled:opacity-50"
                   onClick={handleComplete}
                 >
                   {loading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating...
+                    </>
                   ) : (
-                    <Bot className="mr-2 h-4 w-4" />
+                    <>
+                      <Bot className="mr-2 h-4 w-4" />
+                      Launch
+                    </>
                   )}
-                  Launch Crew
                 </Button>
               </div>
             </div>
           )}
         </div>
+
+        {/* Footer hint */}
+        <p className="mt-6 text-center text-[12px] text-muted-foreground/60">
+          Press Enter to continue • ESC to go back
+        </p>
       </div>
     </div>
   );
