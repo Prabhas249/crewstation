@@ -217,7 +217,7 @@ export default function SettingsPage() {
               <p className="mt-1 text-[11px] text-blue-300/80">
                 <strong>Claude (Anthropic)</strong> — Best for coding, reasoning, and long context. Recommended for most agents.
                 <br />
-                <strong>GPT-4 (OpenAI)</strong> — Great for creative tasks and general use.
+                <strong>OpenAI</strong> — GPT-4, GPT-4o, or GPT-3.5. Great for creative and general tasks.
                 <br />
                 <strong>Gemini (Google)</strong> — Fast and cost-effective for simple tasks.
               </p>
@@ -280,11 +280,11 @@ export default function SettingsPage() {
               <div className="flex items-center gap-2">
                 <Key className="h-4 w-4 text-emerald-400" />
                 <h3 className="text-[13px] font-semibold">
-                  OpenAI API Key (GPT-4)
+                  OpenAI API Key
                 </h3>
               </div>
               <p className="mt-1 text-[11px] text-muted-foreground">
-                Great for creative and general tasks. Get your key from{" "}
+                Use any OpenAI model (GPT-4, GPT-4o, GPT-3.5). Get your key from{" "}
                 <a
                   href="https://platform.openai.com/api-keys"
                   target="_blank"

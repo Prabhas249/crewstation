@@ -184,8 +184,8 @@ export default function OnboardingPage() {
                       : "border-border hover:border-[#ff543d]/50"
                   )}
                 >
-                  <p className="text-[11px] font-semibold">GPT-4</p>
-                  <p className="mt-0.5 text-[9px] text-muted-foreground">Creative</p>
+                  <p className="text-[11px] font-semibold">OpenAI</p>
+                  <p className="mt-0.5 text-[9px] text-muted-foreground">Versatile</p>
                 </button>
                 <button
                   onClick={() => setProvider("gemini")}
