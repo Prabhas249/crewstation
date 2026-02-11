@@ -45,28 +45,28 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-[#ff543d]/5 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-[#ff543d]/[0.02] p-6">
       <div className="w-full max-w-[440px]">
         {/* Single Premium Card */}
-        <div className="rounded-3xl border border-border/50 bg-card/80 backdrop-blur-xl p-10 shadow-2xl shadow-black/10">
+        <div className="rounded-[24px] border border-border/50 bg-card/80 backdrop-blur-xl p-10 shadow-2xl shadow-black/[0.03]">
           {/* Logo + Brand */}
-          <div className="mb-8 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#ff543d] to-[#ff6b56] shadow-lg shadow-[#ff543d]/30">
+          <div className="mb-10 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-[#ff543d] to-[#ff6b56] shadow-xl shadow-[#ff543d]/20">
               <Zap className="h-8 w-8 text-white" />
             </div>
-            <h1 className="mt-5 text-2xl font-bold tracking-tight">ClawDirector</h1>
-            <p className="mt-2 text-[13px] text-muted-foreground">
+            <h1 className="mt-6 text-[32px] font-semibold tracking-tight">ClawDirector</h1>
+            <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
               Direct your AI agent team to production
             </p>
           </div>
 
           {/* Divider */}
-          <div className="relative mb-8">
+          <div className="relative mb-10">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border/50" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-card px-3 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/60">
+              <span className="bg-card px-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/60">
                 Sign In or Sign Up
               </span>
             </div>
@@ -74,7 +74,7 @@ export default function AuthPage() {
 
           {/* Google Button */}
           <Button
-            className="h-[52px] w-full bg-white text-[15px] font-semibold text-gray-900 hover:bg-gray-50 shadow-sm border border-gray-200 transition-all hover:shadow-md"
+            className="h-14 w-full bg-white text-[15px] font-semibold text-gray-900 hover:bg-gray-50 shadow-lg border border-gray-200 transition-all duration-200 hover:shadow-xl hover:scale-[1.01]"
             onClick={handleGoogleAuth}
           >
             <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">
@@ -86,7 +86,7 @@ export default function AuthPage() {
             Continue with Google
           </Button>
 
-          <p className="mt-4 text-center text-[11px] text-muted-foreground">
+          <p className="mt-5 text-center text-[12px] leading-relaxed text-muted-foreground/70">
             Free forever • No credit card • Ready in 30 seconds
           </p>
         </div>
