@@ -35,10 +35,8 @@ export default function AuthPage() {
 
   async function handleGoogleAuth() {
     const supabase = createClient();
-    // Always use production URL, never localhost
-    const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL
-      ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
-      : `${window.location.origin}/auth/callback`;
+    // Use current origin for redirect (works for both clawdirector.com and vercel.app)
+    const redirectUrl = `${window.location.origin}/auth/callback`;
 
     await supabase.auth.signInWithOAuth({
       provider: "google",
