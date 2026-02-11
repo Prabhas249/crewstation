@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CrewStation — AI Agent Orchestration Dashboard",
-  description: "Manage, monitor, and coordinate your AI agent crew. The open-source dashboard for OpenClaw.",
+  title: "ClawDirector — Direct Your AI Agent Team",
+  description: "Create, coach, and orchestrate AI agents. Bring your own Anthropic API key. Built on OpenClaw.",
 };
 
 export default function RootLayout({
@@ -29,6 +30,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
         <ThemeProvider>{children}</ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
