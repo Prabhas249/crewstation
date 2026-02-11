@@ -14,14 +14,11 @@ import {
   EyeOff,
   Loader2,
   CheckCircle2,
-  Wifi,
-  Globe,
 } from "lucide-react";
 
 const tabs = [
   { label: "General", value: "general" },
   { label: "API Keys", value: "api-keys" },
-  { label: "Gateway", value: "gateway" },
   { label: "Notifications", value: "notifications" },
   { label: "Team", value: "team" },
 ];
@@ -35,9 +32,6 @@ export default function SettingsPage() {
   const [workspaceName, setWorkspaceName] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [showApiKey, setShowApiKey] = useState(false);
-  const [gatewayUrl, setGatewayUrl] = useState("");
-  const [gatewayToken, setGatewayToken] = useState("");
-  const [showGatewayToken, setShowGatewayToken] = useState(false);
   const [plan, setPlan] = useState("free");
   const [maxAgents, setMaxAgents] = useState(2);
 
@@ -47,7 +41,6 @@ export default function SettingsPage() {
       if (res.ok) {
         const ws = await res.json();
         setWorkspaceName(ws.name || "");
-        setGatewayUrl(ws.gateway_url || "");
         setPlan(ws.plan || "free");
         setMaxAgents(ws.max_agents || 2);
       }
@@ -272,100 +265,6 @@ export default function SettingsPage() {
                 OpenAI, Google AI, and other providers will be supported in
                 future updates.
               </p>
-            </div>
-          </div>
-        )}
-
-        {/* Gateway */}
-        {activeTab === "gateway" && (
-          <div className="max-w-2xl space-y-4">
-            <div className="glass-panel rounded-xl p-5">
-              <div className="flex items-center gap-2">
-                <Wifi className="h-4 w-4 text-[#ff6b56]" />
-                <h3 className="text-[13px] font-semibold">
-                  OpenClaw Gateway
-                </h3>
-              </div>
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                Connect to your OpenClaw Gateway running on your VPS. This
-                manages agent sessions, persistent memory, and messaging.
-              </p>
-
-              <div className="mt-4 space-y-3.5">
-                <div>
-                  <label className="text-[11px] font-medium">
-                    Gateway URL
-                  </label>
-                  <div className="relative mt-1">
-                    <Globe className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      value={gatewayUrl}
-                      onChange={(e) => setGatewayUrl(e.target.value)}
-                      placeholder="wss://api.crewstation.app/gateway"
-                      className="h-9 pl-8 font-mono text-[12px]"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-[11px] font-medium">
-                    Gateway Token
-                  </label>
-                  <div className="relative mt-1">
-                    <Key className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      type={showGatewayToken ? "text" : "password"}
-                      value={gatewayToken}
-                      onChange={(e) => setGatewayToken(e.target.value)}
-                      placeholder="your-gateway-auth-token"
-                      className="h-9 pl-8 pr-10 font-mono text-[12px]"
-                    />
-                    <button
-                      onClick={() =>
-                        setShowGatewayToken(!showGatewayToken)
-                      }
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    >
-                      {showGatewayToken ? (
-                        <EyeOff className="h-3.5 w-3.5" />
-                      ) : (
-                        <Eye className="h-3.5 w-3.5" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4">
-                <SaveButton
-                  onClick={() =>
-                    handleSave({
-                      gateway_url: gatewayUrl,
-                      gateway_token: gatewayToken,
-                    })
-                  }
-                />
-              </div>
-            </div>
-
-            <div className="glass-panel rounded-xl p-4">
-              <h4 className="text-[12px] font-semibold">Setup Guide</h4>
-              <ol className="mt-2 space-y-1.5 text-[11px] text-muted-foreground">
-                <li>
-                  1. Get a Hetzner VPS ($5/mo) — Ubuntu 22.04
-                </li>
-                <li>
-                  2. Point your domain (e.g. api.crewstation.app) to the VPS IP
-                </li>
-                <li>
-                  3. Run{" "}
-                  <code className="rounded bg-muted px-1 py-0.5 font-mono text-[10px]">
-                    sudo ./deploy/setup.sh
-                  </code>{" "}
-                  from the repo
-                </li>
-                <li>
-                  4. Paste the Gateway URL above
-                </li>
-              </ol>
             </div>
           </div>
         )}
