@@ -41,16 +41,23 @@ export function useGateway({ url, token, onEvent }: UseGatewayOptions) {
     wsRef.current = ws;
 
     ws.onopen = () => {
-      // Send connect handshake
+      // Send connect handshake with correct OpenClaw Protocol v3
       const connectMsg: GatewayMessage = {
         type: "req",
-        id: `req-${++reqIdRef.current}`,
+        id: `connect-${++reqIdRef.current}`,
         method: "connect",
         params: {
-          role: "operator",
-          token,
-          clientId: "crewstation-web",
-          clientVersion: "1.0.0",
+          minProtocol: 3,
+          maxProtocol: 3,
+          client: {
+            id: "gateway-client",
+            version: "1.0.0",
+            platform: typeof navigator !== "undefined" ? navigator.platform : "web",
+            mode: "ui",
+          },
+          auth: {
+            token,
+          },
         },
       };
       ws.send(JSON.stringify(connectMsg));
