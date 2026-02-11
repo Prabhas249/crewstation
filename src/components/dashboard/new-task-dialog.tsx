@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,8 +19,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockAgents } from "@/lib/mock-data";
-import { AGENT_STATUS_CONFIG } from "@/lib/constants";
+
+interface SimpleAgent {
+  id: string;
+  name: string;
+  role: string;
+  avatar: string;
+  status: string;
+}
 
 const PRIORITIES = [
   { value: "low", label: "Low", color: "text-zinc-400", bg: "bg-zinc-400", ring: "border-zinc-400/30", activeBg: "bg-zinc-400/15" },
@@ -29,25 +35,72 @@ const PRIORITIES = [
   { value: "critical", label: "Critical", color: "text-red-400", bg: "bg-red-400", ring: "border-red-400/30", activeBg: "bg-red-400/15" },
 ] as const;
 
+const STATUS_DOT: Record<string, string> = {
+  online: "bg-emerald-400",
+  busy: "bg-amber-400",
+  idle: "bg-blue-400",
+  offline: "bg-muted-foreground",
+  error: "bg-red-400",
+};
+
 export function NewTaskDialog({
   open,
   onOpenChange,
+  onCreated,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCreated?: () => void;
 }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [assignedTo, setAssignedTo] = useState("auto");
+  const [assignedTo, setAssignedTo] = useState("");
   const [priority, setPriority] = useState<string>("medium");
+  const [agents, setAgents] = useState<SimpleAgent[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  function handleCreate() {
-    // Future: wire to backend
-    onOpenChange(false);
-    setTitle("");
-    setDescription("");
-    setAssignedTo("auto");
-    setPriority("medium");
+  useEffect(() => {
+    if (open) {
+      fetch("/api/agents")
+        .then((r) => r.json())
+        .then((data) => {
+          if (Array.isArray(data)) setAgents(data);
+        })
+        .catch(() => {});
+    }
+  }, [open]);
+
+  async function handleCreate() {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          description,
+          priority,
+          assigned_agent_id: assignedTo || null,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to create task");
+      }
+
+      onOpenChange(false);
+      onCreated?.();
+      setTitle("");
+      setDescription("");
+      setAssignedTo("");
+      setPriority("medium");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create task");
+    }
+    setLoading(false);
   }
 
   return (
@@ -96,38 +149,26 @@ export function NewTaskDialog({
           </label>
           <Select value={assignedTo} onValueChange={setAssignedTo}>
             <SelectTrigger className="mt-1.5 w-full h-8 bg-muted border-border text-[12px] text-foreground data-[placeholder]:text-muted-foreground/40 focus-visible:border-[#ff543d]/40 focus-visible:ring-[#ff543d]/10">
-              <SelectValue placeholder="Select an agent..." />
+              <SelectValue placeholder="Add to inbox (unassigned)..." />
             </SelectTrigger>
             <SelectContent className="bg-card/95 backdrop-blur-xl border-border">
-              <SelectItem
-                value="auto"
-                className="text-[12px] text-foreground/70 focus:bg-muted focus:text-foreground"
-              >
-                <span className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#ff543d]" />
-                  Auto-assign (Priya)
-                </span>
-              </SelectItem>
-              {mockAgents.map((agent) => {
-                const statusCfg = AGENT_STATUS_CONFIG[agent.status];
-                return (
-                  <SelectItem
-                    key={agent.id}
-                    value={agent.id}
-                    className="text-[12px] text-foreground/70 focus:bg-muted focus:text-foreground"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span
-                        className={`h-1.5 w-1.5 rounded-full ${statusCfg.dotColor}`}
-                      />
-                      {agent.name}
-                      <span className="text-[10px] text-muted-foreground/60">
-                        ({agent.role})
-                      </span>
+              {agents.map((agent) => (
+                <SelectItem
+                  key={agent.id}
+                  value={agent.id}
+                  className="text-[12px] text-foreground/70 focus:bg-muted focus:text-foreground"
+                >
+                  <span className="flex items-center gap-2">
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[agent.status] || "bg-muted-foreground"}`}
+                    />
+                    {agent.name}
+                    <span className="text-[10px] text-muted-foreground/60">
+                      ({agent.role})
                     </span>
-                  </SelectItem>
-                );
-              })}
+                  </span>
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -165,6 +206,10 @@ export function NewTaskDialog({
           </div>
         </div>
 
+        {error && (
+          <p className="mt-2 text-[11px] text-red-400">{error}</p>
+        )}
+
         <DialogFooter className="mt-4 gap-2 sm:gap-2">
           <Button
             variant="outline"
@@ -175,10 +220,10 @@ export function NewTaskDialog({
           </Button>
           <Button
             onClick={handleCreate}
-            disabled={!title}
+            disabled={!title || loading}
             className="h-8 bg-[#ff543d] text-[12px] text-white hover:bg-[#ff6b56] disabled:opacity-40"
           >
-            Create Task
+            {loading ? "Creating..." : "Create Task"}
           </Button>
         </DialogFooter>
       </DialogContent>

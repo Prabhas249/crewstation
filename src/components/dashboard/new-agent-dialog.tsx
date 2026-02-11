@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -56,15 +56,19 @@ You are a {role} agent.
 export function NewAgentDialog({
   open,
   onOpenChange,
+  onCreated,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCreated?: () => void;
 }) {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [model, setModel] = useState("");
   const [description, setDescription] = useState("");
   const [capabilities, setCapabilities] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   function toggleCapability(cap: string) {
     setCapabilities((prev) => {
@@ -78,15 +82,39 @@ export function NewAgentDialog({
     });
   }
 
-  function handleCreate() {
-    // Future: wire to backend
-    onOpenChange(false);
-    setName("");
-    setRole("");
-    setModel("");
-    setDescription("");
-    setCapabilities(new Set());
-  }
+  const handleCreate = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const personality = SOUL_TEMPLATE.replace("{role}", role);
+      const res = await fetch("/api/agents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          role,
+          personality,
+          model: model || "claude-sonnet-4-5-20250929",
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to create agent");
+      }
+
+      onOpenChange(false);
+      onCreated?.();
+      setName("");
+      setRole("");
+      setModel("");
+      setDescription("");
+      setCapabilities(new Set());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create agent");
+    }
+    setLoading(false);
+  }, [name, role, model, onOpenChange, onCreated]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -200,6 +228,10 @@ export function NewAgentDialog({
           </div>
         </div>
 
+        {error && (
+          <p className="mt-2 text-[11px] text-red-400">{error}</p>
+        )}
+
         <DialogFooter className="mt-4 gap-2 sm:gap-2">
           <Button
             variant="outline"
@@ -210,10 +242,10 @@ export function NewAgentDialog({
           </Button>
           <Button
             onClick={handleCreate}
-            disabled={!name || !role || !model}
+            disabled={!name || !role || !model || loading}
             className="h-8 bg-[#ff543d] text-[12px] text-white hover:bg-[#ff6b56] disabled:opacity-40"
           >
-            Create Agent
+            {loading ? "Creating..." : "Create Agent"}
           </Button>
         </DialogFooter>
       </DialogContent>
