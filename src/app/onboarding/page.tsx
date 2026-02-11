@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Zap, Key, Bot, ArrowRight, Loader2, Check } from "lucide-react";
+import { Zap, Key, Bot, ArrowRight, Loader2, Check, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
@@ -26,6 +26,34 @@ export default function OnboardingPage() {
   // Step 3: First Agent
   const [agentName, setAgentName] = useState("");
   const [agentRole, setAgentRole] = useState("");
+
+  // Keyboard navigation
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (loading) return;
+
+      if (e.key === "Escape") {
+        e.preventDefault();
+        if (step > 0) {
+          setStep(step - 1);
+        } else {
+          router.push("/");
+        }
+      }
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (step < 2) {
+          setStep(step + 1);
+        } else if (step === 2) {
+          handleComplete();
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [step, loading, router]);
 
   async function handleComplete() {
     setLoading(true);
@@ -82,8 +110,8 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-[#ff543d]/[0.02] p-6">
-      <div className="w-full max-w-[480px]">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-[#ff543d]/[0.02] p-4 sm:p-6">
+      <div className="w-full max-w-[480px] mx-auto">
         {/* Header */}
         <div className="mb-12 text-center">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-[#ff543d] to-[#ff6b56] shadow-xl shadow-[#ff543d]/20">
@@ -147,17 +175,26 @@ export default function OnboardingPage() {
               <Input
                 value={workspaceName}
                 onChange={(e) => setWorkspaceName(e.target.value)}
-                placeholder="Acme Corp"
+                placeholder="ClawDirector"
                 className="h-12 rounded-xl border-border/50 text-[15px] transition-all focus:border-[#ff543d]/30 focus:ring-4 focus:ring-[#ff543d]/10"
                 autoFocus
               />
-              <Button
-                className="h-12 w-full rounded-xl bg-gradient-to-b from-[#ff543d] to-[#ff5a47] text-[15px] font-semibold shadow-lg shadow-[#ff543d]/20 transition-all hover:shadow-xl hover:shadow-[#ff543d]/30"
-                onClick={() => setStep(1)}
-              >
-                Continue
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="h-12 flex-1 rounded-xl border-border/50 text-[15px] font-medium hover:bg-background"
+                  onClick={() => router.push("/")}
+                >
+                  Back
+                </Button>
+                <Button
+                  className="h-12 flex-1 rounded-xl bg-gradient-to-b from-[#ff543d] to-[#ff5a47] text-[15px] font-semibold shadow-lg shadow-[#ff543d]/20 transition-all hover:shadow-xl hover:shadow-[#ff543d]/30"
+                  onClick={() => setStep(1)}
+                >
+                  Continue
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
             </div>
           )}
 
@@ -214,6 +251,46 @@ export default function OnboardingPage() {
                 }
                 className="h-12 rounded-xl border-border/50 font-mono text-[14px] transition-all focus:border-[#ff543d]/30 focus:ring-4 focus:ring-[#ff543d]/10"
               />
+
+              {/* API Key Help */}
+              <div className="rounded-xl bg-muted/30 p-4 space-y-2">
+                <p className="text-[12px] font-medium text-foreground">
+                  Where to get your API key:
+                </p>
+                {provider === "anthropic" && (
+                  <a
+                    href="https://console.anthropic.com/settings/keys"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-[11px] text-[#ff543d] hover:text-[#ff6b56] transition-colors"
+                  >
+                    console.anthropic.com/settings/keys
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+                {provider === "openai" && (
+                  <a
+                    href="https://platform.openai.com/api-keys"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-[11px] text-[#ff543d] hover:text-[#ff6b56] transition-colors"
+                  >
+                    platform.openai.com/api-keys
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+                {provider === "gemini" && (
+                  <a
+                    href="https://aistudio.google.com/app/apikey"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-[11px] text-[#ff543d] hover:text-[#ff6b56] transition-colors"
+                  >
+                    aistudio.google.com/app/apikey
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+              </div>
 
               <p className="text-[11px] leading-relaxed text-muted-foreground">
                 Stored encrypted. Skip for now and add later in settings.
