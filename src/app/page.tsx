@@ -7,18 +7,13 @@ export default function LandingPage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-[#ff543d]/5">
       {/* Header */}
       <header className="border-b border-border/50 backdrop-blur-xl">
-        <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
+        <div className="mx-auto max-w-6xl px-4 py-4">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#ff543d] to-[#ff6b56]">
               <Zap className="h-4 w-4 text-white" />
             </div>
             <span className="text-lg font-bold">ClawDirector</span>
           </div>
-          <Link href="/auth">
-            <Button variant="ghost" size="sm" className="text-[13px]">
-              Sign In
-            </Button>
-          </Link>
         </div>
       </header>
 
