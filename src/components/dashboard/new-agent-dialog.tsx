@@ -21,11 +21,18 @@ import {
 } from "@/components/ui/select";
 
 const MODELS = [
-  { value: "claude-sonnet-4-5-20250929", label: "Claude Sonnet 4.5" },
-  { value: "claude-haiku-4-5-20251001", label: "Claude Haiku 4.5" },
-  { value: "claude-opus-4-20250115", label: "Claude Opus 4" },
+  // Anthropic Claude (latest 2026)
+  { value: "claude-opus-4-6", label: "Claude Opus 4.6", badge: "Latest" },
+  { value: "claude-sonnet-4-5", label: "Claude Sonnet 4.5", badge: "Recommended" },
+  { value: "claude-haiku-4-5", label: "Claude Haiku 4.5", badge: "Fastest" },
+  // OpenAI (latest 2026)
+  { value: "gpt-5.3-codex", label: "GPT-5.3 Codex", badge: "Latest" },
   { value: "gpt-4o", label: "GPT-4o" },
-  { value: "deepseek-r1", label: "DeepSeek R1" },
+  { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
+  // Google Gemini (latest 2026)
+  { value: "gemini-3-flash", label: "Gemini 3 Flash", badge: "Latest" },
+  { value: "gemini-3-pro-preview", label: "Gemini 3 Pro Preview", badge: "Most Capable" },
+  { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
 ];
 
 const CAPABILITIES = [
@@ -94,7 +101,7 @@ export function NewAgentDialog({
           name,
           role,
           personality,
-          model: model || "claude-sonnet-4-5-20250929",
+          model: model || "claude-sonnet-4-5",
         }),
       });
 
@@ -169,9 +176,11 @@ export function NewAgentDialog({
                   className="text-[12px] text-foreground/70 focus:bg-muted focus:text-foreground"
                 >
                   {m.label}
-                  <span className="ml-2 text-[10px] text-muted-foreground/60 font-mono">
-                    {m.value}
-                  </span>
+                  {'badge' in m && m.badge && (
+                    <span className="ml-2 rounded-full bg-[#ff543d]/15 px-1.5 py-0.5 text-[9px] font-semibold text-[#ff6b56]">
+                      {m.badge}
+                    </span>
+                  )}
                 </SelectItem>
               ))}
             </SelectContent>
