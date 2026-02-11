@@ -35,9 +35,10 @@ export default function AuthPage() {
 
   async function handleGoogleAuth() {
     const supabase = createClient();
-    const redirectUrl = typeof window !== "undefined"
-      ? `${window.location.origin}/auth/callback`
-      : "https://clawdirector.com/auth/callback";
+    // Always use production URL, never localhost
+    const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+      : `${window.location.origin}/auth/callback`;
 
     await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -88,11 +89,7 @@ export default function AuthPage() {
           </Button>
 
           <p className="mt-4 text-center text-[11px] text-muted-foreground">
-            New users start onboarding • Existing users go to dashboard
-          </p>
-
-          <p className="mt-6 text-center text-[11px] text-muted-foreground">
-            Free forever • No credit card • Setup in 30 seconds
+            Free forever • No credit card • Ready in 30 seconds
           </p>
         </div>
       </div>
