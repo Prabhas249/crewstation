@@ -30,8 +30,12 @@ export default function SettingsPage() {
 
   // Workspace state
   const [workspaceName, setWorkspaceName] = useState("");
-  const [apiKey, setApiKey] = useState("");
-  const [showApiKey, setShowApiKey] = useState(false);
+  const [anthropicKey, setAnthropicKey] = useState("");
+  const [openaiKey, setOpenaiKey] = useState("");
+  const [geminiKey, setGeminiKey] = useState("");
+  const [showAnthropicKey, setShowAnthropicKey] = useState(false);
+  const [showOpenaiKey, setShowOpenaiKey] = useState(false);
+  const [showGeminiKey, setShowGeminiKey] = useState(false);
   const [plan, setPlan] = useState("free");
   const [maxAgents, setMaxAgents] = useState(2);
 
@@ -205,16 +209,33 @@ export default function SettingsPage() {
         {/* API Keys */}
         {activeTab === "api-keys" && (
           <div className="max-w-2xl space-y-4">
+            {/* Info Banner */}
+            <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
+              <p className="text-[12px] font-medium text-blue-400">
+                💡 Choose Your AI Provider
+              </p>
+              <p className="mt-1 text-[11px] text-blue-300/80">
+                <strong>Claude (Anthropic)</strong> — Best for coding, reasoning, and long context. Recommended for most agents.
+                <br />
+                <strong>GPT-4 (OpenAI)</strong> — Great for creative tasks and general use.
+                <br />
+                <strong>Gemini (Google)</strong> — Fast and cost-effective for simple tasks.
+              </p>
+            </div>
+
+            {/* Anthropic */}
             <div className="glass-panel rounded-xl p-5">
               <div className="flex items-center gap-2">
                 <Key className="h-4 w-4 text-[#ff6b56]" />
                 <h3 className="text-[13px] font-semibold">
-                  Anthropic API Key
+                  Anthropic API Key (Claude)
                 </h3>
+                <Badge variant="secondary" className="text-[9px]">
+                  Recommended
+                </Badge>
               </div>
               <p className="mt-1 text-[11px] text-muted-foreground">
-                Your agents use Claude to think. BYOK — we never touch your key.
-                Get one from{" "}
+                Best for coding and complex tasks. Get your key from{" "}
                 <a
                   href="https://console.anthropic.com/settings/keys"
                   target="_blank"
@@ -227,45 +248,134 @@ export default function SettingsPage() {
               <div className="mt-4">
                 <div className="relative">
                   <Input
-                    type={showApiKey ? "text" : "password"}
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
+                    type={showAnthropicKey ? "text" : "password"}
+                    value={anthropicKey}
+                    onChange={(e) => setAnthropicKey(e.target.value)}
                     placeholder="sk-ant-api03-..."
                     className="h-9 pr-10 font-mono text-[12px]"
                   />
                   <button
-                    onClick={() => setShowApiKey(!showApiKey)}
+                    onClick={() => setShowAnthropicKey(!showAnthropicKey)}
                     className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
-                    {showApiKey ? (
+                    {showAnthropicKey ? (
                       <EyeOff className="h-3.5 w-3.5" />
                     ) : (
                       <Eye className="h-3.5 w-3.5" />
                     )}
                   </button>
                 </div>
-                <p className="mt-1.5 text-[10px] text-muted-foreground">
-                  Stored encrypted in your workspace. Never shared or logged.
-                </p>
               </div>
               <div className="mt-4">
                 <SaveButton
                   onClick={() =>
-                    handleSave({ anthropic_api_key: apiKey })
+                    handleSave({ anthropic_api_key: anthropicKey })
                   }
                 />
               </div>
             </div>
 
-            <div className="glass-panel rounded-xl border-dashed p-5 opacity-50">
-              <h3 className="text-[13px] font-semibold">
-                More providers coming soon
-              </h3>
-              <p className="mt-0.5 text-[11px] text-muted-foreground">
-                OpenAI, Google AI, and other providers will be supported in
-                future updates.
+            {/* OpenAI */}
+            <div className="glass-panel rounded-xl p-5">
+              <div className="flex items-center gap-2">
+                <Key className="h-4 w-4 text-emerald-400" />
+                <h3 className="text-[13px] font-semibold">
+                  OpenAI API Key (GPT-4)
+                </h3>
+              </div>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Great for creative and general tasks. Get your key from{" "}
+                <a
+                  href="https://platform.openai.com/api-keys"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-[#ff543d] hover:underline"
+                >
+                  platform.openai.com
+                </a>
               </p>
+              <div className="mt-4">
+                <div className="relative">
+                  <Input
+                    type={showOpenaiKey ? "text" : "password"}
+                    value={openaiKey}
+                    onChange={(e) => setOpenaiKey(e.target.value)}
+                    placeholder="sk-..."
+                    className="h-9 pr-10 font-mono text-[12px]"
+                  />
+                  <button
+                    onClick={() => setShowOpenaiKey(!showOpenaiKey)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showOpenaiKey ? (
+                      <EyeOff className="h-3.5 w-3.5" />
+                    ) : (
+                      <Eye className="h-3.5 w-3.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div className="mt-4">
+                <SaveButton
+                  onClick={() =>
+                    handleSave({ openai_api_key: openaiKey })
+                  }
+                />
+              </div>
             </div>
+
+            {/* Gemini */}
+            <div className="glass-panel rounded-xl p-5">
+              <div className="flex items-center gap-2">
+                <Key className="h-4 w-4 text-blue-400" />
+                <h3 className="text-[13px] font-semibold">
+                  Google Gemini API Key
+                </h3>
+              </div>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Fast and affordable for simple tasks. Get your key from{" "}
+                <a
+                  href="https://makersuite.google.com/app/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-[#ff543d] hover:underline"
+                >
+                  Google AI Studio
+                </a>
+              </p>
+              <div className="mt-4">
+                <div className="relative">
+                  <Input
+                    type={showGeminiKey ? "text" : "password"}
+                    value={geminiKey}
+                    onChange={(e) => setGeminiKey(e.target.value)}
+                    placeholder="AIza..."
+                    className="h-9 pr-10 font-mono text-[12px]"
+                  />
+                  <button
+                    onClick={() => setShowGeminiKey(!showGeminiKey)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showGeminiKey ? (
+                      <EyeOff className="h-3.5 w-3.5" />
+                    ) : (
+                      <Eye className="h-3.5 w-3.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div className="mt-4">
+                <SaveButton
+                  onClick={() =>
+                    handleSave({ gemini_api_key: geminiKey })
+                  }
+                />
+              </div>
+            </div>
+
+            <p className="text-center text-[10px] text-muted-foreground">
+              All keys are stored encrypted. We never see or log your keys. BYOK = Bring Your Own Key.
+            </p>
           </div>
         )}
 

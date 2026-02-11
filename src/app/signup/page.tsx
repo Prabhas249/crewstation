@@ -16,6 +16,7 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [checkEmail, setCheckEmail] = useState(false);
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
@@ -23,10 +24,13 @@ export default function SignUpPage() {
     setError("");
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: name } },
+      options: {
+        data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
 
     if (error) {
@@ -35,8 +39,16 @@ export default function SignUpPage() {
       return;
     }
 
-    router.push("/onboarding");
-    router.refresh();
+    // Check if email confirmation is required
+    if (data?.user && !data.session) {
+      // Email confirmation required - show check email message
+      setCheckEmail(true);
+      setLoading(false);
+    } else {
+      // Auto-confirmed or instant login - proceed to onboarding
+      router.push("/onboarding");
+      router.refresh();
+    }
   }
 
   async function handleGoogleSignUp() {
@@ -47,6 +59,39 @@ export default function SignUpPage() {
     });
   }
 
+  // Show "check email" message after signup
+  if (checkEmail) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <div className="w-full max-w-sm space-y-6 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10">
+            <Mail className="h-8 w-8 text-emerald-500" />
+          </div>
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight">Check your email</h1>
+            <p className="mt-2 text-[13px] text-muted-foreground">
+              We sent a confirmation link to <strong>{email}</strong>
+            </p>
+            <p className="mt-2 text-[12px] text-muted-foreground">
+              Click the link in the email to activate your account and get started.
+            </p>
+          </div>
+          <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
+            <p className="text-[11px] text-blue-300/80">
+              💡 Didn't receive it? Check your spam folder or{" "}
+              <button
+                onClick={() => setCheckEmail(false)}
+                className="font-medium text-[#ff543d] hover:underline"
+              >
+                try again
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm space-y-6">
@@ -55,8 +100,10 @@ export default function SignUpPage() {
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-[#ff543d]">
             <Zap className="h-5 w-5 text-white" />
           </div>
-          <h1 className="mt-4 text-xl font-semibold tracking-tight">{APP_NAME}</h1>
-          <p className="mt-1 text-[13px] text-muted-foreground">Create your account</p>
+          <h1 className="mt-4 text-xl font-semibold tracking-tight">ClawDirector</h1>
+          <p className="mt-1 text-[13px] text-muted-foreground">
+            Direct your AI agent team to production
+          </p>
         </div>
 
         {/* Google OAuth */}

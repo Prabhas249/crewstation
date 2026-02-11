@@ -53,8 +53,10 @@ export default function LoginPage() {
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-[#ff543d]">
             <Zap className="h-5 w-5 text-white" />
           </div>
-          <h1 className="mt-4 text-xl font-semibold tracking-tight">{APP_NAME}</h1>
-          <p className="mt-1 text-[13px] text-muted-foreground">Sign in to your dashboard</p>
+          <h1 className="mt-4 text-xl font-semibold tracking-tight">ClawDirector</h1>
+          <p className="mt-1 text-[13px] text-muted-foreground">
+            Direct your AI agent team to production
+          </p>
         </div>
 
         {/* Google OAuth */}
