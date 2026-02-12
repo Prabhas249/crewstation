@@ -36,6 +36,8 @@ export default function SettingsPage() {
   const [showAnthropicKey, setShowAnthropicKey] = useState(false);
   const [showOpenaiKey, setShowOpenaiKey] = useState(false);
   const [showGeminiKey, setShowGeminiKey] = useState(false);
+  const [gatewayToken, setGatewayToken] = useState("");
+  const [showGatewayToken, setShowGatewayToken] = useState(false);
   const [plan, setPlan] = useState("free");
   const [maxAgents, setMaxAgents] = useState(2);
 
@@ -209,6 +211,53 @@ export default function SettingsPage() {
         {/* API Keys */}
         {activeTab === "api-keys" && (
           <div className="max-w-2xl space-y-4">
+            {/* Gateway Token (OpenClaw) */}
+            <div className="glass-panel rounded-xl p-5 border-2 border-[#ff543d]/20">
+              <div className="flex items-center gap-2">
+                <Key className="h-4 w-4 text-[#ff6b56]" />
+                <h3 className="text-[13px] font-semibold">
+                  OpenClaw Gateway Token
+                </h3>
+                <Badge variant="destructive" className="text-[9px]">
+                  Required
+                </Badge>
+              </div>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Connect your dashboard to OpenClaw Gateway. Get token from your VPS: <code className="rounded bg-muted px-1 py-0.5 font-mono text-[10px]">docker exec openclaw cat /workspace/.openclaw/gateway.json</code>
+              </p>
+              <div className="mt-4">
+                <div className="relative">
+                  <Input
+                    type={showGatewayToken ? "text" : "password"}
+                    value={gatewayToken}
+                    onChange={(e) => setGatewayToken(e.target.value)}
+                    placeholder="gw_xxxxxxxxxxxxxxxxxx"
+                    className="h-9 pr-10 font-mono text-[12px]"
+                  />
+                  <button
+                    onClick={() => setShowGatewayToken(!showGatewayToken)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showGatewayToken ? (
+                      <EyeOff className="h-3.5 w-3.5" />
+                    ) : (
+                      <Eye className="h-3.5 w-3.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div className="mt-4">
+                <SaveButton
+                  onClick={() =>
+                    handleSave({
+                      gateway_url: "wss://api.clawdirector.com",
+                      gateway_token: gatewayToken
+                    })
+                  }
+                />
+              </div>
+            </div>
+
             {/* Info Banner */}
             <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
               <p className="text-[12px] font-medium text-blue-400">

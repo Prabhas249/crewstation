@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ArrowLeft, Bot, Sparkles, Send, Activity, MessageSquare, Wifi } from "lucide-react";
 import { TopBar } from "@/components/layout/top-bar";
+import { AgentChat } from "@/components/dashboard/agent-chat";
 import { cn } from "@/lib/utils";
 import { AGENT_STATUS_CONFIG, TASK_STATUS_CONFIG } from "@/lib/constants";
 import { mockAgents, mockTasks, PRIYA_ID } from "@/lib/mock-data";
@@ -352,6 +353,16 @@ ${agent.description}
 - Asks for clarification when needed`}
               </pre>
             </div>
+          </div>
+        </div>
+
+        {/* Chat with Agent */}
+        <div className="glass-panel rounded-xl overflow-hidden">
+          <div className="border-b border-border px-4 py-3">
+            <h3 className="text-[13px] font-semibold">Chat with {agent.name}</h3>
+          </div>
+          <div className="p-4">
+            <AgentChat agentId={agent.id} agentName={agent.name} />
           </div>
         </div>
 
